@@ -62,6 +62,48 @@ async function fetchPin() {
       // Add the clickable pin element to the body
       document.body.appendChild(userLink);
 
+      if (pin.comments && pin.comments.length > 0) {
+
+
+        const commentsSection = document.createElement("div");
+        commentsSection.classList.add("comments-section");
+
+        const commentsHeader = document.createElement("h2");
+        commentsHeader.textContent = "Comments";
+
+        commentsSection.appendChild(commentsHeader);
+
+        for (const comment of pin.comments) {
+            const commentContainer = document.createElement("div");
+            commentContainer.classList.add("comment");
+            const commentUserResponse = await fetch(`http://127.0.0.1:8000/users/uid/${comment.user_uid}`);
+            const commentUserData = await commentUserResponse.json();
+            const commentUsername = document.createElement("span");
+            commentUsername.textContent = commentUserData.username;
+            const commentProfileResponse = await fetch(`http://127.0.0.1:8000/users/files/${commentUserData.profile}`);
+            const commentProfileBlob = await commentProfileResponse.blob();
+            const commentProfileURL = URL.createObjectURL(commentProfileBlob);
+            const commentProfileImg = document.createElement("img");
+            commentProfileImg.src = commentProfileURL;
+            commentProfileImg.alt = `${commentUserData.username}'s profile`;
+            commentProfileImg.width = 30;
+            commentProfileImg.height = 30;
+            const commentText = document.createElement("p");
+            commentText.textContent = comment.text;
+
+            const userLink = document.createElement("a");
+            userLink.href = `/${commentUserData.username}`;
+            userLink.appendChild(commentUsername)
+            userLink.appendChild(commentProfileImg)
+
+
+            commentContainer.appendChild(userLink);
+            commentContainer.appendChild(commentText);
+            commentsSection.appendChild(commentContainer);
+        }
+        document.body.appendChild(commentsSection);
+      }
+
 
       const hr = document.createElement("hr");
       document.body.appendChild(hr);
@@ -150,8 +192,13 @@ async function fetchPin() {
             // Add the clickable pin element to the body
             document.body.appendChild(link);
             document.body.appendChild(userLink);
+          }
         }
-    }
+        
+
+
+
+
     
     } catch (error) {
         console.error("There was a problem with the fetch operation:", error);

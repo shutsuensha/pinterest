@@ -16,6 +16,10 @@ class TagName(BaseModel):
     uid: UUID
     name: str
 
+class CommentText(BaseModel):
+    text: str
+    user_uid: UUID
+
 class PinResponseModel(BaseModel):
     uid: UUID
     title: str
@@ -23,3 +27,4 @@ class PinResponseModel(BaseModel):
     media: str
     user: PinUserModel
     tags: list[TagName]
+    comments: list[CommentText]

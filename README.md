@@ -1,8 +1,3 @@
-## TO DO
-
-users can add comments to pins
-users can likes pins and comments
-
 ## Features
 user registration
 user verification via email
@@ -14,6 +9,8 @@ users create pins with media - images/videos
 users add tags to pin
 users get all pins
 users get detail pin and related pins by tags
+users can view profiles
+users can add comments to pin
 
 
 ## Web server
