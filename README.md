@@ -1,18 +1,18 @@
 ## Features
-user registration
-user verification via email
-user authentication via JWT and Cookies
-user logout
-user reset password via email
-user avatars
-users create pins with media - images/videos
-users add tags to pin
-users get all pins
-users get detail pin and related pins by tags
-users can view profiles with pins created by user
-users can add comments to pin
-users can add image to comment
-users can reply to comments
+> user registration
+> user verification via email
+> user authentication via JWT and Cookies
+> user logout
+> user reset password via email
+> user avatars
+> users create pins with media - images/videos
+> users add tags to pin
+> users get all pins
+> users get detail pin and related pins by tags
+> users can view profiles with pins created by user
+> users can add comments to pin
+> users can add image to comment
+> users can reply to comments
 
 ## Screenshots
 
