@@ -17,8 +17,10 @@ class TagName(BaseModel):
     name: str
 
 class CommentText(BaseModel):
+    uid: UUID
     text: str
     user_uid: UUID
+    media: str | None = None
 
 class PinResponseModel(BaseModel):
     uid: UUID

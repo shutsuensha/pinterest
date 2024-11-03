@@ -19,20 +19,28 @@ templates = Jinja2Templates(directory="app/templates")
 
 
 @app.get("/")
-async def read_item(request: Request):
+async def main_page(request: Request):
     return templates.TemplateResponse(
         request=request, name="index.html"
     )
 
+
 @app.get("/pin/{pin_uid}")
-async def read_item(request: Request, pin_uid: str):
+async def pin_detail(request: Request, pin_uid: str):
     return templates.TemplateResponse(
         request=request, name="pin.html", context={'pin_uid': pin_uid}
     )
 
 
+@app.get('/pin-creation-tool')
+async def create_pin(request: Request):
+    return templates.TemplateResponse(
+        request=request, name="createPin.html"
+    )
+
+
 @app.get("/{username}")
-async def read_item(request: Request, username: str):
+async def user_detail(request: Request, username: str):
     return templates.TemplateResponse(
         request=request, name="user.html", context={'username': username}
     )

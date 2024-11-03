@@ -1,28 +1,31 @@
 async function fetchPins() {
+  const anchor = document.createElement("a");
+  anchor.href = "/pin-creation-tool";
+  anchor.className = "create-pin-button";
+  anchor.textContent = "Create Pin";
+
+  document.body.appendChild(anchor);
   try {
-    // Fetch all pins
     const pinsResponse = await fetch("http://127.0.0.1:8000/pins/");
     const pins = await pinsResponse.json();
 
-    // Iterate over each pin and fetch related media
-    for (const pin of pins) {
-      // Create anchor element linking to the pin's detail page
-      const link = document.createElement("a");
-      link.href = `/pin/${pin.uid}`;
-      link.style.textDecoration = "none"; // Remove default underline
+    const pinsContainer = document.createElement("div");
+    pinsContainer.classList.add("pins-container"); // Updated class for the floating layout
 
+    for (const pin of pins) {
       const pinElement = document.createElement("div");
       pinElement.classList.add("pin");
 
-      // Add title and description
-      const title = document.createElement("h3");
-      title.textContent = pin.title;
+      // Create anchor for mediaContainer
+      const mediaLink = document.createElement("a");
+      mediaLink.href = `/pin/${pin.uid}`; // Link to the specific pin
+      mediaLink.classList.add("media-link");
+      mediaLink.style.textDecoration = "none"; // Remove underline
 
-      // Add username
-      const username = document.createElement("span");
-      username.textContent = `Posted by: ${pin.user.username}`;
+      // Media container
+      const mediaContainer = document.createElement("div");
+      mediaContainer.classList.add("media-container");
 
-      // Fetch and display media (image or video)
       const mediaResponse = await fetch(`http://127.0.0.1:8000/pins/files/${pin.media}`);
       const mediaBlob = await mediaResponse.blob();
       const mediaURL = URL.createObjectURL(mediaBlob);
@@ -32,15 +35,39 @@ async function fetchPins() {
         mediaElement = document.createElement("video");
         mediaElement.src = mediaURL;
         mediaElement.controls = true;
-        mediaElement.width = 300;
       } else {
         mediaElement = document.createElement("img");
         mediaElement.src = mediaURL;
         mediaElement.alt = pin.title;
-        mediaElement.width = 300;
       }
+      mediaContainer.appendChild(mediaElement);
 
-      // Fetch and display profile image
+      const title = document.createElement("h3");
+      title.textContent = pin.title;
+      mediaContainer.appendChild(title);
+
+      // Append mediaContainer to the link
+      mediaLink.appendChild(mediaContainer);
+
+      // Append the link to pinElement
+      pinElement.appendChild(mediaLink);
+
+      // Create anchor for userContainer
+      const userLink = document.createElement("a");
+      userLink.href = `/${pin.user.username}`; // Link to the user's profile
+      userLink.classList.add("user-link");
+
+      // User container
+      const userContainer = document.createElement("div");
+      userContainer.classList.add("user-container");
+      userContainer.style.display = "flex"; // Use flexbox for alignment
+      userContainer.style.alignItems = "center"; // Center items vertically
+
+      const username = document.createElement("span");
+      username.textContent = `${pin.user.username}`;
+      username.classList.add("username");
+      userContainer.appendChild(username);
+
       const profileResponse = await fetch(`http://127.0.0.1:8000/users/files/${pin.user.profile}`);
       const profileBlob = await profileResponse.blob();
       const profileURL = URL.createObjectURL(profileBlob);
@@ -48,29 +75,26 @@ async function fetchPins() {
       const profileImg = document.createElement("img");
       profileImg.src = profileURL;
       profileImg.alt = `${pin.user.username}'s profile`;
-      profileImg.width = 50;
-      profileImg.height = 50;
+      profileImg.classList.add("profile-img");
 
-      // Append all elements to the pin container
-      pinElement.appendChild(mediaElement);
-      pinElement.appendChild(title);
+      // Append profileImg to the left of username
+      userContainer.prepend(profileImg); // Move profileImg before username
 
-      // Append pin element to the anchor link
-      link.appendChild(pinElement);
+      // Append userContainer to the userLink
+      userLink.appendChild(userContainer);
 
-      const userLink = document.createElement("a");
-      userLink.href = `/${pin.user.username}`;
-      userLink.appendChild(username)
-      userLink.appendChild(profileImg)
+      // Append the user link to pinElement
+      pinElement.appendChild(userLink);
 
-      // Add the clickable pin element to the body
-      document.body.appendChild(link);
-      document.body.appendChild(userLink);
+      // Append each pin to the container
+      pinsContainer.appendChild(pinElement);
     }
+
+    // Append pins container to the body
+    document.body.appendChild(pinsContainer);
   } catch (error) {
     console.error("Error fetching pins:", error);
   }
 }
 
-// Run the function to fetch and display pins
 fetchPins();

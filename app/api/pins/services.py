@@ -43,3 +43,4 @@ class PinService:
         result = await session.exec(statement)
 
         return result.all()
+    

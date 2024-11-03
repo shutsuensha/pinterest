@@ -9,9 +9,20 @@ users create pins with media - images/videos
 users add tags to pin
 users get all pins
 users get detail pin and related pins by tags
-users can view profiles
+users can view profiles with pins created by user
 users can add comments to pin
+users can add image to comment
+users can reply to comments
 
+## Screenshots
+
+![Screenshot of feature](./screenshots/image.png)
+
+![Screenshot of feature](./screenshots/Screenshot_1.png)
+
+![Screenshot of feature](./screenshots/Screenshot_2.png)
+
+![Screenshot of feature](./screenshots/Screenshot_3.png)
 
 ## Web server
 uvicorn app.app:app --reload

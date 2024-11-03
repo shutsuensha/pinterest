@@ -94,7 +94,10 @@ class Comment(SQLModel, table=True):
     text: str
 
     user_uid: UUID = Field(foreign_key="user_accounts.uid")
-    pin_uid: UUID = Field(foreign_key="pins.uid")
+    pin_uid: UUID | None = Field(default=None, foreign_key="pins.uid")
+    parent_uid: UUID | None = Field(default=None, foreign_key="comments.uid")
+
+    media: str | None = None
 
     created_at: datetime = Field(default_factory=datetime.now)
 

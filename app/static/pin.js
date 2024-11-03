@@ -7,6 +7,7 @@ async function fetchPin() {
       
       const pinElement = document.createElement("div");
       pinElement.classList.add("pin");
+
       
       // Add title and description
       const title = document.createElement("h3");
@@ -58,6 +59,8 @@ async function fetchPin() {
       userLink.href = `/${pin.user.username}`;
       userLink.appendChild(username)
       userLink.appendChild(profileImg)
+      userLink.classList.add("user-link");
+
 
       // Add the clickable pin element to the body
       document.body.appendChild(userLink);
@@ -66,6 +69,7 @@ async function fetchPin() {
 
 
         const commentsSection = document.createElement("div");
+
         commentsSection.classList.add("comments-section");
 
         const commentsHeader = document.createElement("h2");
@@ -99,6 +103,68 @@ async function fetchPin() {
 
             commentContainer.appendChild(userLink);
             commentContainer.appendChild(commentText);
+            if (comment.media) {
+              const profileResponse = await fetch(`http://127.0.0.1:8000/comment/files/${comment.media}`);
+              const profileBlob = await profileResponse.blob();
+              const profileURL = URL.createObjectURL(profileBlob);
+          
+              const profileImg23 = document.createElement("img");
+              profileImg23.src = profileURL;
+              profileImg23.alt = 'comment media';
+              profileImg23.width = 50;
+              profileImg23.height = 50;
+              commentContainer.appendChild(profileImg23)
+            }
+
+
+            const repliesResponse = await fetch(`http://127.0.0.1:8000/comment/reply/${comment.uid}`);
+            const repliesData = await repliesResponse.json();
+
+            if (repliesData && repliesData.length > 0) {
+              for (const reply of repliesData) {
+                const replyContainer = document.createElement("div");
+                replyContainer.classList.add("reply");
+                const replyUserResponse = await fetch(`http://127.0.0.1:8000/users/uid/${reply.user_uid}`);
+                const replyUserData = await replyUserResponse.json();
+                const replyUsername = document.createElement("span");
+                replyUsername.textContent = replyUserData.username;
+                const replyProfileResponse = await fetch(`http://127.0.0.1:8000/users/files/${replyUserData.profile}`);
+                const replyProfileBlob = await replyProfileResponse.blob();
+                const replyProfileURL = URL.createObjectURL(replyProfileBlob);
+                const replyProfileImg = document.createElement("img");
+                replyProfileImg.src = replyProfileURL;
+                replyProfileImg.alt = `${replyUserData.username}'s profile`;
+                replyProfileImg.width = 30;
+                replyProfileImg.height = 30;
+                const replyText = document.createElement("p");
+                replyText.textContent = reply.text;
+                const userLink = document.createElement("a");
+                userLink.href = `/${replyUserData.username}`;
+                userLink.appendChild(replyUsername)
+                userLink.appendChild(replyProfileImg)
+
+                replyContainer.appendChild(userLink)
+                replyContainer.appendChild(replyText)
+
+                if (reply.media) {
+                  const profileResponse1 = await fetch(`http://127.0.0.1:8000/comment/files/${reply.media}`);
+                  const profileBlob1 = await profileResponse1.blob();
+                  const profileURL1 = URL.createObjectURL(profileBlob1);
+              
+                  const profileImg1 = document.createElement("img");
+                  profileImg1.src = profileURL1;
+                  profileImg1.alt = 'comment media';
+                  profileImg1.width = 50;
+                  profileImg1.height = 50;
+                  replyContainer.appendChild(profileImg1)
+                }
+
+                commentContainer.appendChild(replyContainer)  
+              }
+            }
+
+
+
             commentsSection.appendChild(commentContainer);
         }
         document.body.appendChild(commentsSection);
@@ -194,11 +260,7 @@ async function fetchPin() {
             document.body.appendChild(userLink);
           }
         }
-        
-
-
-
-
+      
     
     } catch (error) {
         console.error("There was a problem with the fetch operation:", error);

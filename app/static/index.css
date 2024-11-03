@@ -1,0 +1,85 @@
+.pins-container {
+  overflow: hidden; /* Clear floats */
+  padding: 16px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pin {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.2s;
+  display: inline-block; /* Make the pin an inline-block element */
+  width: 250px; /* Set a fixed width for pins */
+  margin: 8px; /* Add margin for spacing */
+  vertical-align: top; /* Align pins to the top */
+}
+
+.pin:hover {
+  transform: scale(1.05);
+}
+
+.pin img,
+.pin video {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+.pin h3 {
+  margin: 8px 0 4px;
+  font-size: 16px;
+  color: #333;
+  text-align: center;
+}
+
+.pin .username {
+  font-size: 14px;
+  color: #888;
+}
+
+.profile-img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-top: 8px;
+}
+
+.user-link {
+  text-decoration: none; /* Remove underline from userLink */
+  color: inherit; /* Inherit the text color from the parent element */
+}
+
+.user-link:hover {
+  text-decoration: underline; /* Add underline on hover */
+}
+
+.user-container {
+  display: flex; /* Use flexbox for alignment */
+  align-items: center; /* Center items vertically */
+}
+
+.profile-img {
+  width: 40px; /* Set desired width */
+  height: 40px; /* Set desired height */
+  border-radius: 50%; /* Make it circular */
+  margin-right: 8px; /* Add space between image and username */
+  object-fit: cover; /* Ensure image fits well within the circle */
+}
+
+.create-pin-button {
+  display: inline-block; /* Make the link behave like a button */
+  padding: 10px 20px; /* Add some padding */
+  background-color: #4CAF50; /* Green background */
+  color: white; /* White text */
+  text-align: center; /* Center text */
+  text-decoration: none; /* Remove underline */
+  border-radius: 5px; /* Rounded corners */
+  transition: background-color 0.3s; /* Smooth background change */
+}
+
+.create-pin-button:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
