@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log In</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='login.css') }}">
+</head>
+<body>
+
+  <div class="login-container">
+    <h2>Log In</h2>
+    <form id="login-form">
+      
+      <!-- Username -->
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" required placeholder="Enter your username">
+      
+      <!-- Password -->
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required placeholder="Enter your password">
+      
+      <!-- Submit Button -->
+      <button type="submit" class="submit-btn">Log In</button>
+      
+    </form>
+    
+    <!-- Redirect to Sign Up -->
+    <p>Don't have an account? <a href="/signup">Sign Up</a></p>
+
+  </div>
+
+  <script>
+    document.getElementById('login-form').addEventListener('submit', async (event) => {
+      event.preventDefault(); // Prevent the default form submission
+
+      // Get form data
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        // Send a POST request to the login endpoint
+        const loginResponse = await fetch('/users/simple/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            username: username,
+            password: password
+          })
+        });
+
+        if (loginResponse.status === 404) {
+          alert("User not found. Please check your username.");
+        } else if (loginResponse.status === 400) {
+          alert("Incorrect password. Please try again.");
+        } else if (loginResponse.ok) {
+          // Redirect to home page after successful login
+          window.location.href = '/';
+        } else {
+          // Handle other unexpected errors
+          const errorData = await loginResponse.json();
+          alert(`Login failed: ${errorData.message}`);
+        }
+      } catch (error) {
+        console.error('Error during login:', error);
+        alert('An error occurred. Please try again.');
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -3,13 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User</title>
+    <title>User Profile</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center horizontally */
+            padding: 20px;
+            font-family: Arial, sans-serif; /* Set default font */
+            background-color: #f4f4f4; /* Light background */
+        }
+
+        .user-info {
+            text-align: center; /* Center text */
+            margin-bottom: 20px; /* Space below user info */
+        }
+
+        .pin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Responsive grid */
+            gap: 20px; /* Space between grid items */
+            width: 100%; /* Make it responsive */
+            max-width: 1200px; /* Limit max width */
+            margin-top: 20px; /* Space above the grid */
+        }
+
+        .pin {
+            border: 1px solid #ccc; /* Optional: add a border */
+            border-radius: 5px; /* Rounded corners */
+            overflow: hidden; /* Hide overflow */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: shadow for effect */
+            background: #fff; /* White background for pin */
+            transition: transform 0.2s; /* Smooth transition */
+        }
+
+        .pin:hover {
+            transform: scale(1.02); /* Slight zoom on hover */
+        }
+
+        .pin img, .pin video {
+            width: 100%; /* Make media elements responsive */
+            height: auto; /* Maintain aspect ratio */
+        }
+
+        h3 {
+            margin: 10px 0; /* Space around title */
+        }
+
+        p {
+            padding: 0 10px; /* Add padding to description */
+            color: #555; /* Darker text for readability */
+        }
+    </style>
     <script>
-        // Make pin_uid accessible in pin.js
-        const username = "{{ username }}";
+        // Make username accessible in user.js
+        const username = "{{ username }}"; // Replace with server-side variable or set dynamically
     </script>
-    <script src="{{ url_for('static', path='/user.js') }}" defer></script> <!-- Include your JavaScript file -->
 </head>
 <body>
+    <div class="user-info">
+        <p id="username"></p>
+        <img id="profile-image" alt="User Profile Image" width="200" height="200">
+    </div>
+    <div class="pin-grid" id="pin-grid"></div>
+
+    <script>
+        async function fetchUserData() {
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/users/username/${username}`);
+
+                if (response.status === 200) {
+                    const userData = await response.json();
+                    
+                    // Set the username
+                    document.getElementById("username").textContent = userData.username;
+
+                    // Fetch the profile image
+                    const imageResponse = await fetch("http://127.0.0.1:8000/users/files/" + userData.profile);
+                    if (imageResponse.status === 200) {
+                        const blob = await imageResponse.blob();
+                        const imageUrl = URL.createObjectURL(blob);
+                        document.getElementById("profile-image").src = imageUrl;
+                    } else {
+                        console.error("Failed to fetch the image:", imageResponse.status, imageResponse.statusText);
+                    }
+
+                    // Handle pins
+                    const pinGrid = document.getElementById("pin-grid");
+                    for (const pin of userData.pins) {
+                        const pinElement = document.createElement("div");
+                        pinElement.classList.add("pin");
+        
+                        // Add title and description
+                        const title = document.createElement("h3");
+                        title.textContent = pin.title;
+                        pinElement.appendChild(title);
+                        
+                        const description = document.createElement("p");
+                        description.textContent = pin.description;
+                        pinElement.appendChild(description);
+        
+                        // Fetch and display media (image or video)
+                        const mediaResponse = await fetch(`http://127.0.0.1:8000/pins/files/${pin.media}`);
+                        const mediaBlob = await mediaResponse.blob();
+                        const mediaURL = URL.createObjectURL(mediaBlob);
+                        
+                        let mediaElement;
+                        if (pin.media.endsWith(".mp4")) {
+                            mediaElement = document.createElement("video");
+                            mediaElement.src = mediaURL;
+                            mediaElement.controls = true;
+                        } else {
+                            mediaElement = document.createElement("img");
+                            mediaElement.src = mediaURL;
+                            mediaElement.alt = pin.title;
+                        }
+
+                        pinElement.appendChild(mediaElement);
+        
+                        // Create link for the pin
+                        const link = document.createElement("a");
+                        link.href = `/pin/${pin.uid}`;
+                        link.style.textDecoration = "none"; // Remove default underline
+                        link.appendChild(pinElement);
+        
+                        // Add pin element to the grid
+                        pinGrid.appendChild(link);
+                    }
+                } else {
+                    const errorData = await response.json();
+                    console.log("Error data:", errorData);
+                }
+            } catch (error) {
+                console.error("There was a problem with the fetch operation:", error);
+            }
+        }
+
+        fetchUserData();
+    </script>
 </body>
 </html>

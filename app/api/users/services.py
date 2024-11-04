@@ -145,4 +145,17 @@ class UserService:
         return user
     
 
+    async def simple_authenticate_user(self, session: AsyncSession, username: str, password: str):
+        user = await self.get_user_by_username(username, session)
+        
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        
+        # Verify the password
+        if not verify_password(password, user.password_hash):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password doesn't match")
+        
+        return user
+    
+
 

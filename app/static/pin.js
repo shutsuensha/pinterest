@@ -198,7 +198,6 @@ async function fetchPin() {
             link.style.textDecoration = "none"; // Remove default underline
       
             const pinElement = document.createElement("div");
-            pinElement.classList.add("pin");
       
             // Add title and description
             const title = document.createElement("h3");

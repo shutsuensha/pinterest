@@ -28,8 +28,8 @@ async def create_pin(session: session_dep, user_uid: user_dep, data_model: PinCr
 
 
 @pin_router.get('/', response_model=list[PinResponseModel])
-async def get_pins(session: session_dep):
-    pins = await pin_service.get_all_pins(session)
+async def get_pins(session: session_dep, page: int, limit: int):
+    pins = await pin_service.get_all_pins(session, page, limit)
     return pins
 
 

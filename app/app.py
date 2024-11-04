@@ -24,6 +24,18 @@ async def main_page(request: Request):
         request=request, name="index.html"
     )
 
+@app.get("/signup")
+async def main_page(request: Request):
+    return templates.TemplateResponse(
+        request=request, name="signup.html"
+    )
+
+@app.get("/login")
+async def main_page(request: Request):
+    return templates.TemplateResponse(
+        request=request, name="login.html"
+    )
+
 
 @app.get("/pin/{pin_uid}")
 async def pin_detail(request: Request, pin_uid: str):

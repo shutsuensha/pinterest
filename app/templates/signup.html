@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='signup.css') }}">
+</head>
+<body>
+
+  <div class="signup-container">
+    <h2 id="header">Sign Up</h2>
+    <form id="signup-form">
+      
+      <!-- Username -->
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" required placeholder="Enter your username">
+      
+      <!-- Password -->
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required placeholder="Enter your password">
+      
+      <!-- Submit Button -->
+      <button type="submit" class="submit-btn">Sign Up</button>
+      
+    </form>
+    
+    <!-- Redirect to Login -->
+    <p>Already have an account? <a href="/login">Log In</a></p>
+
+  </div>
+
+  <script>
+    async function uploadMedia(mediaFile) {
+        const formData = new FormData();
+        formData.append('file', mediaFile); // Ensure we use the correct name
+
+        try {
+            const response = await fetch(`/users/upload`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error('Error uploading media');
+            }
+
+            // Redirect to home page or show success message
+            window.location.href = '/';
+        } catch (error) {
+            console.error('Error:', error);
+            alert('There was a problem uploading your media.');
+        }
+    }
+
+    document.getElementById('signup-form').addEventListener('submit', async (event) => {
+      event.preventDefault(); // Prevent the default form submission
+
+      // Get form data
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        // Send a POST request to the signup endpoint
+        const signupResponse = await fetch('/users/simple/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            username: username,
+            password: password
+          })
+        });
+
+        if (signupResponse.status === 409) {
+          alert("User already exists. Please try a different username.");
+        } else if (signupResponse.status === 201) {
+          // Automatically log in the user after successful signup
+          const loginResponse = await fetch('/users/simple/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              username: username,
+              password: password
+            })
+          });
+
+          if (loginResponse.ok) {
+            // Hide the signup and login elements
+            document.getElementById('signup-form').style.display = 'none';
+            document.querySelector('p').style.display = 'none';
+
+            // Show the profile image upload form
+            const pinForm = document.createElement('form');
+            pinForm.id = 'pinForm';
+            pinForm.className = 'pin-form'; // Add the class for styling
+            pinForm.enctype = 'multipart/form-data'; // Set enctype for file upload
+
+            const pinHeader = document.createElement('h3');
+            pinHeader.textContent = 'Upload Your Profile Image';
+            pinForm.appendChild(pinHeader); // Add the header to the form
+
+            const mediaInput = document.createElement('input');
+            mediaInput.type = 'file';
+            mediaInput.name = 'file'; // Use the correct name expected by the API
+            mediaInput.accept = 'image/*';
+            mediaInput.required = true;
+
+            const submitButton = document.createElement('button');
+            submitButton.type = 'submit';
+            submitButton.textContent = 'Upload Image';
+            submitButton.className = 'submit-btn'; // Add class for styling
+
+            pinForm.appendChild(mediaInput);
+            pinForm.appendChild(submitButton);
+
+            // Handle profile image upload
+            pinForm.addEventListener('submit', async (event) => {
+                event.preventDefault(); // Prevent the default form submission
+                const file = mediaInput.files[0]; // Get the selected file
+                await uploadMedia(file);
+            });
+
+            document.getElementsByClassName('signup-container')[0].appendChild(pinForm);
+
+
+          } else {
+            alert("Login failed. Please try logging in manually.");
+          }
+        } else {
+          // Handle other errors
+          const errorData = await signupResponse.json();
+          alert(`Signup failed: ${errorData.message}`);
+        }
+      } catch (error) {
+        console.error('Error during signup:', error);
+        alert('An error occurred. Please try again.');
+      }
+    });
+  </script>
+
+</body>
+</html>

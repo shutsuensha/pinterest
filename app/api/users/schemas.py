@@ -17,6 +17,11 @@ class UserCreateModel(BaseModel):
     }
 
 
+class UserSimpleCreateModel(BaseModel):
+    password: str
+    username: str
+
+
 class UserPinsModel(BaseModel):
     uid: UUID
     title: str
@@ -25,8 +30,8 @@ class UserPinsModel(BaseModel):
 
 
 class UserResponseModel(BaseModel):
-    email: str
-    username: str
+    email: str | None = None
+    username: str | None = None
     profile: str | None = None
     pins: list[UserPinsModel]
 
@@ -49,6 +54,11 @@ class UserLoginModel(BaseModel):
             }
         }
     }
+
+
+class UserSimpleLoginModel(BaseModel):
+    username: str
+    password: str
 
 
 class PasswordResetRequestModel(BaseModel):

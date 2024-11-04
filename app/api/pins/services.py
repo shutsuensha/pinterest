@@ -37,8 +37,8 @@ class PinService:
         return pin
     
 
-    async def get_all_pins(self, session: AsyncSession):
-        statement = select(Pin).order_by(desc(Pin.created_at))
+    async def get_all_pins(self, session: AsyncSession, page: int, limit: int):
+        statement = select(Pin).order_by(desc(Pin.created_at)).offset(page*limit).limit(limit)
 
         result = await session.exec(statement)
 

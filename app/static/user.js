@@ -4,15 +4,11 @@ async function fetchUserData() {
 
         if (response.status == 200) {
             const userData = await response.json();
-
-            const emailElement = document.createElement("p");
-            emailElement.textContent = `Email: ${userData.email}`;
             
             const usernameElement = document.createElement("p");
-            usernameElement.textContent = `Username: ${userData.username}`;
+            usernameElement.textContent = `${userData.username}`;
             
             // Append these elements to the body or a specific container
-            document.body.appendChild(emailElement);
             document.body.appendChild(usernameElement);
 
             // Fetch the profile image

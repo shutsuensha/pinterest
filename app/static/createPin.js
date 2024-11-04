@@ -12,8 +12,7 @@ async function uploadMedia(pinUid, mediaFile) {
             throw new Error('Error uploading media');
         }
 
-        const result = await response.json();
-        console.log('Media uploaded successfully:', result);
+        window.location.href = '/';
     } catch (error) {
         console.error('Error:', error);
         alert('There was a problem uploading your media.');
@@ -21,6 +20,7 @@ async function uploadMedia(pinUid, mediaFile) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    const pinFormContainer = document.getElementById('pinFormContainer');
     const pinForm = document.createElement('form');
     pinForm.id = 'pinForm';
 
@@ -28,13 +28,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const titleInput = document.createElement('input');
     titleInput.type = 'text';
     titleInput.name = 'title';
-    titleInput.placeholder = 'Enter pin title';
+    titleInput.placeholder = 'Pin Title';
     titleInput.required = true;
 
     // Description Input
     const descriptionInput = document.createElement('textarea');
     descriptionInput.name = 'description';
-    descriptionInput.placeholder = 'Enter pin description';
+    descriptionInput.placeholder = 'Pin Description';
     descriptionInput.required = true;
 
     // Media Input
@@ -48,20 +48,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const tagsInput = document.createElement('input');
     tagsInput.type = 'text';
     tagsInput.name = 'tags';
-    tagsInput.placeholder = 'Enter tags separated by commas';
+    tagsInput.placeholder = 'Tags (comma separated)';
     tagsInput.required = true;
 
     // Submit Button
     const submitButton = document.createElement('button');
     submitButton.type = 'submit';
     submitButton.textContent = 'Create Pin';
+    submitButton.className = 'submit-button';
 
     pinForm.appendChild(titleInput);
     pinForm.appendChild(descriptionInput);
     pinForm.appendChild(mediaInput);
     pinForm.appendChild(tagsInput);
     pinForm.appendChild(submitButton);
-    document.body.appendChild(pinForm);
+    pinFormContainer.appendChild(pinForm);
 
     pinForm.addEventListener('submit', async (event) => {
         event.preventDefault(); // Prevent the default form submission
@@ -72,7 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const tags = formData.get('tags').split(',').map(tag => tag.trim());
         const mediaFile = formData.get('media');
     
-        try {
             // Step 1: Create the pin
             const createPinResponse = await fetch('/pins/', {
                 method: 'POST',
@@ -111,9 +111,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
             alert('Pin created successfully with media and tags!');
             pinForm.reset(); // Reset the form after successful submission
-        } catch (error) {
-            console.error('Error:', error);
-            alert('There was a problem creating your pin.');
-        }
+        
     });
 });

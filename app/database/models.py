@@ -8,7 +8,7 @@ class User(SQLModel, table=True):
 
     uid: UUID = Field(primary_key=True, default_factory=uuid4)
 
-    email: str = Field(unique=True)
+    email: str | None = Field(default=None, unique=True)
     password_hash: str
 
     username: str

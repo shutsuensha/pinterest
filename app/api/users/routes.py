@@ -3,7 +3,13 @@ from .services import UserService
 from typing import Annotated
 from app.database.db import get_session
 from sqlmodel.ext.asyncio.session import AsyncSession
-from .schemas import UserCreateModel, UserLoginModel, PasswordResetRequestModel, UserResponseModel, UserSimpleModel
+from .schemas import (
+    UserCreateModel, 
+    UserLoginModel, 
+    PasswordResetRequestModel, 
+    UserResponseModel, 
+    UserSimpleModel, 
+    UserSimpleCreateModel, UserSimpleLoginModel)
 from .utils import create_access_token
 from datetime import timedelta
 from .depends import get_current_user_uid
@@ -47,6 +53,25 @@ async def create_user_account(
     }
 
 
+@users_router.post(
+    "/simple/signup", status_code=status.HTTP_201_CREATED
+)
+async def create_user_account(
+    session: session_dep,
+    user_data: UserSimpleCreateModel
+):
+    user = await user_service.get_user_by_username(user_data.username, session)
+    if user:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail='user already exists'
+        )
+
+    new_user = await user_service.create_user(user_data, session)
+
+    return new_user
+
+
 @users_router.get("/verify/{token}")
 async def verify_user_account(token: str, session: session_dep):
 
@@ -70,6 +95,22 @@ async def login_users(
     user = await user_service.authenticate_user(session, email, password)
 
     access_token = create_access_token({"user_uid": str(user.uid)}, expires_delta=timedelta(days=5))
+    response.set_cookie("access_token", access_token)
+    return {"access_token": access_token}
+
+
+@users_router.post("/simple/login")
+async def login_users(
+    login_data: UserSimpleLoginModel, 
+    session: session_dep,
+    response: Response
+):
+    username = login_data.username
+    password = login_data.password
+
+    user = await user_service.simple_authenticate_user(session, username, password)
+
+    access_token = create_access_token({"user_uid": str(user.uid), "username": user.username}, expires_delta=timedelta(days=5))
     response.set_cookie("access_token", access_token)
     return {"access_token": access_token}
 
