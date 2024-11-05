@@ -30,6 +30,7 @@ class UserPinsModel(BaseModel):
 
 
 class UserResponseModel(BaseModel):
+    uid: UUID
     email: str | None = None
     username: str | None = None
     profile: str | None = None

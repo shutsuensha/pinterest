@@ -6,7 +6,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from .schemas import TagResponseModel, AddTagsToPin, PinWithTags
 from app.api.pins.schemas import PinResponseModel
 
-tag_router = APIRouter(prefix='/tags', tags=['tags'])
+tag_router = APIRouter()
 tag_service = TagService()
 session_dep = Annotated[AsyncSession, Depends(get_session)]
 

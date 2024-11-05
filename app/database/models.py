@@ -9,9 +9,10 @@ class User(SQLModel, table=True):
     uid: UUID = Field(primary_key=True, default_factory=uuid4)
 
     email: str | None = Field(default=None, unique=True)
-    password_hash: str
 
+    password_hash: str
     username: str
+
     is_verified: bool = False
     created_at: datetime = Field(default_factory=datetime.now)
 
@@ -105,4 +106,14 @@ class Comment(SQLModel, table=True):
     pin: Pin = Relationship(back_populates="comments")
 
     def __repr__(self):
-        return f"<Review for book {self.book_uid} by user {self.user_uid}>"
+        return f"<Comment {self.text}>"
+    
+
+class Like(SQLModel, table=True):
+    __tablename__ = "likes"
+
+    uid: UUID = Field(primary_key=True, default_factory=uuid4)
+    user_uid: UUID = Field(foreign_key="user_accounts.uid")
+    pin_uid: UUID | None = Field(default=None, foreign_key="pins.uid")
+    comment_uid: UUID | None = Field(default=None, foreign_key="comments.uid")
+    

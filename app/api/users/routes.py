@@ -18,12 +18,10 @@ from pathlib import Path
 import uuid
 
 
-
-users_router = APIRouter(prefix='/users', tags=['users'])
+users_router = APIRouter()
 user_service = UserService()
 session_dep = Annotated[AsyncSession, Depends(get_session)]
 user_dep = Annotated[str, Depends(get_current_user_uid)]
-
 
 
 @users_router.post(
@@ -53,25 +51,6 @@ async def create_user_account(
     }
 
 
-@users_router.post(
-    "/simple/signup", status_code=status.HTTP_201_CREATED
-)
-async def create_user_account(
-    session: session_dep,
-    user_data: UserSimpleCreateModel
-):
-    user = await user_service.get_user_by_username(user_data.username, session)
-    if user:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail='user already exists'
-        )
-
-    new_user = await user_service.create_user(user_data, session)
-
-    return new_user
-
-
 @users_router.get("/verify/{token}")
 async def verify_user_account(token: str, session: session_dep):
 
@@ -99,24 +78,8 @@ async def login_users(
     return {"access_token": access_token}
 
 
-@users_router.post("/simple/login")
-async def login_users(
-    login_data: UserSimpleLoginModel, 
-    session: session_dep,
-    response: Response
-):
-    username = login_data.username
-    password = login_data.password
-
-    user = await user_service.simple_authenticate_user(session, username, password)
-
-    access_token = create_access_token({"user_uid": str(user.uid), "username": user.username}, expires_delta=timedelta(days=5))
-    response.set_cookie("access_token", access_token)
-    return {"access_token": access_token}
-
-
 @users_router.post("/logout")
-async def logout(response: Response):
+async def logout(user_uid: user_dep, response: Response):
     response.delete_cookie("access_token")
     return {"status": "OK"}
 
@@ -126,14 +89,21 @@ async def get_me(user_uid: user_dep, session: session_dep):
     user = await user_service.get_user_by_uid(user_uid, session)
     return user
 
+
 @users_router.get('/username/{username}', response_model=UserResponseModel)
-async def get_user_by_username(session: session_dep, username: str):
+async def get_user_by_username(user_uid: user_dep, session: session_dep, username: str):
     user = await user_service.get_user_by_username(username, session)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
     return user
 
+
 @users_router.get('/uid/{user_uid}', response_model=UserSimpleModel)
-async def get_user(session: session_dep, user_uid: str):
+async def get_user(_: user_dep, session: session_dep, user_uid: str):
     user = await user_service.get_user_by_uid(user_uid, session)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return user
 
 
@@ -162,15 +132,19 @@ async def create_upload_file(user_uid: user_dep, session: session_dep, file: Upl
 
 
 @users_router.get("/files/{profile}")
-async def get_uploaded_file(session: session_dep, profile: str):
+async def get_uploaded_file(user_uid: user_dep, session: session_dep, profile: str):
     return FileResponse(f'app/media/users/{profile}')
 
 
 @users_router.post("/pasword-reset-rsequest")
-async def password_reset_request(reset_data: PasswordResetRequestModel):
+async def password_reset_request(reset_data: PasswordResetRequestModel, session: session_dep):
     email = reset_data.email
     new_password = reset_data.new_password
     confirm_new_password = reset_data.confirm_new_password
+
+    user_exists = await user_service.user_exists(email, session)
+    if not user_exists:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     if new_password != confirm_new_password:
         raise HTTPException(
@@ -196,3 +170,38 @@ async def reset_account_password(
         "message": "Password reset Successfully",
         "user": updated_user    
     }
+
+
+@users_router.post(
+    "/simple/signup", status_code=status.HTTP_201_CREATED
+)
+async def create_user_account(
+    session: session_dep,
+    user_data: UserSimpleCreateModel
+):
+    user = await user_service.get_user_by_username(user_data.username, session)
+    if user:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail='user already exists'
+        )
+
+    new_user = await user_service.create_user(user_data, session)
+
+    return new_user
+
+
+@users_router.post("/simple/login")
+async def login_users(
+    login_data: UserSimpleLoginModel, 
+    session: session_dep,
+    response: Response
+):
+    username = login_data.username
+    password = login_data.password
+
+    user = await user_service.simple_authenticate_user(session, username, password)
+
+    access_token = create_access_token({"user_uid": str(user.uid), "username": user.username}, expires_delta=timedelta(days=5))
+    response.set_cookie("access_token", access_token)
+    return {"access_token": access_token}

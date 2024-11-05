@@ -6,6 +6,7 @@ from datetime import timedelta, datetime, timezone
 import jwt
 from jwt.exceptions import DecodeError, ExpiredSignatureError
 
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 serializer = URLSafeTimedSerializer(secret_key=settings.JWT_SECRET)
 

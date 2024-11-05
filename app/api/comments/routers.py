@@ -11,7 +11,7 @@ from fastapi.responses import FileResponse
 
 
 
-comment_router = APIRouter(prefix='/comment', tags=['comments'])
+comment_router = APIRouter()
 comment_service = CommentService()
 session_dep = Annotated[AsyncSession, Depends(get_session)]
 user_dep = Annotated[str, Depends(get_current_user_uid)]

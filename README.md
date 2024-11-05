@@ -1,3 +1,6 @@
+## TO DO
+
+
 ## Features
 - user registration
 - user verification via email
@@ -14,17 +17,6 @@
 - users can add image to comment
 - users can reply to comments
 
-## Web server
-uvicorn app.app:app --reload
-
-## Postgres
-sudo systemctl start postgresql
-sudo systemctl status postgresql
-psql -U evalshine -d pinterest
-
-## Alembic
-alembic revision --autogenerate -m "init"
-alembic upgrade head
 
 ## Redis
 sudo systemctl start redis-server
@@ -32,3 +24,18 @@ sudo systemctl status redis-server
 
 ## Celery
 celery -A app.celery_tasks.celery.c_app worker --loglevel=INFO
+
+
+## Postgres
+sudo systemctl start postgresql
+sudo systemctl status postgresql
+psql -U evalshine -d pinterest
+
+
+## Alembic
+alembic revision --autogenerate -m "init"
+alembic upgrade head
+
+
+## Web server
+uvicorn app.app:app --reload

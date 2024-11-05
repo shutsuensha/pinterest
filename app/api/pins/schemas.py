@@ -26,7 +26,7 @@ class PinResponseModel(BaseModel):
     uid: UUID
     title: str
     description: str
-    media: str
+    media: str | None = None
     user: PinUserModel
     tags: list[TagName]
     comments: list[CommentText]

@@ -11,7 +11,7 @@ import uuid
 
 
 
-pin_router = APIRouter(prefix='/pins', tags=['pins'])
+pin_router = APIRouter()
 pin_service = PinService()
 session_dep = Annotated[AsyncSession, Depends(get_session)]
 user_dep = Annotated[str, Depends(get_current_user_uid)]
@@ -28,7 +28,7 @@ async def create_pin(session: session_dep, user_uid: user_dep, data_model: PinCr
 
 
 @pin_router.get('/', response_model=list[PinResponseModel])
-async def get_pins(session: session_dep, page: int, limit: int):
+async def get_pins(user_uid: user_dep, session: session_dep, page: int, limit: int):
     pins = await pin_service.get_all_pins(session, page, limit)
     return pins
 
@@ -44,10 +44,12 @@ async def get_pins(session: session_dep, pin_uid: str):
 async def create_upload_file(user_uid: user_dep, session: session_dep, file: UploadFile, pin_uid: str):
 
     pin = await pin_service.get_pin_by_uid(pin_uid, session)
+    if not pin:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pin not found")
     if str(pin.user_uid) != str(user_uid):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail='u dont have permisions'
+            detail='U dont have permisions'
         )
     
     if pin.media:

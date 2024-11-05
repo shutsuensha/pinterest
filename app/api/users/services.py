@@ -72,7 +72,7 @@ class UserService:
     def send_verification(self, email: str):
         token = create_url_safe_token({"email": email})
 
-        link = f"http://{settings.DOMAIN}/users/verify/{token}"
+        link = f"http://{settings.DOMAIN}/api/v1/users/verify/{token}"
 
         html_message = f"""
         <h1>Verify your Email</h1>
@@ -88,7 +88,7 @@ class UserService:
     def send_password_reset(self, email: str, password: str):
         token = create_url_safe_token({"email": email, "password": password})
 
-        link = f"http://{settings.DOMAIN}/users/password-reset-confirm/{token}"
+        link = f"http://{settings.DOMAIN}/api/v1/users/password-reset-confirm/{token}"
 
         html_message = f"""
         <h1>Reset Your Password</h1>

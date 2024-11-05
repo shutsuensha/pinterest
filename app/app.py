@@ -1,58 +1,48 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from app.api.users.routes import users_router
 from app.api.pins.routes import pin_router
 from app.api.tags.routers import tag_router
 from app.api.comments.routers import comment_router
-from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
 
-app = FastAPI()
+version = "v1"
 
-app.include_router(pin_router)
-app.include_router(comment_router)
-app.include_router(tag_router)
-app.include_router(users_router)
+description = """
+A REST API for pinterest like app.
 
+This REST API is able to:
+- user registration
+- user verification via email
+- user authentication via JWT and Cookies
+- user logout
+- user reset password via email
+- user avatars
+- users create pins with media - images/videos
+- users add tags to pin
+- users get all pins
+- users get detail pin and related pins by tags
+- users can view profiles with pins created by user
+- users can add comments to pin
+- users can add image to comment
+- users can reply to comments
+"""
 
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
-templates = Jinja2Templates(directory="app/templates")
+version_prefix =f"/api/{version}"
 
+app = FastAPI(
+    title="Pinterest",
+    description=description,
+    version=version,
+    contact={
+        "name": "Daniil Kupryianchyk",
+        "url": "https://github.com/shutsuensha",
+        "email": "dankupr21@gmail.com",
+    },
+    openapi_url=f"{version_prefix}/openapi.json",
+    docs_url=f"{version_prefix}/docs",
+    redoc_url=f"{version_prefix}/redoc",
+)
 
-@app.get("/")
-async def main_page(request: Request):
-    return templates.TemplateResponse(
-        request=request, name="index.html"
-    )
-
-@app.get("/signup")
-async def main_page(request: Request):
-    return templates.TemplateResponse(
-        request=request, name="signup.html"
-    )
-
-@app.get("/login")
-async def main_page(request: Request):
-    return templates.TemplateResponse(
-        request=request, name="login.html"
-    )
-
-
-@app.get("/pin/{pin_uid}")
-async def pin_detail(request: Request, pin_uid: str):
-    return templates.TemplateResponse(
-        request=request, name="pin.html", context={'pin_uid': pin_uid}
-    )
-
-
-@app.get('/pin-creation-tool')
-async def create_pin(request: Request):
-    return templates.TemplateResponse(
-        request=request, name="createPin.html"
-    )
-
-
-@app.get("/{username}")
-async def user_detail(request: Request, username: str):
-    return templates.TemplateResponse(
-        request=request, name="user.html", context={'username': username}
-    )
+app.include_router(pin_router, prefix=f'{version_prefix}/pins', tags=['pins'])
+app.include_router(comment_router, prefix=f'{version_prefix}/comments', tags=['comments'])
+app.include_router(tag_router, prefix=f'{version_prefix}/tags', tags=['tags'])
+app.include_router(users_router, prefix=f'{version_prefix}/users', tags=['users'])
