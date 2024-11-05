@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+<title>Pinterest</title>
+{% endblock %}
+{% block head %}
+
+<style>
+    .background-image1 {
+        background-image: url('https://i.pinimg.com/564x/b8/51/78/b85178bffa0f26892173b37fe22fec1b.jpg');
+        background-size: cover;
+        background-position: center;
+    }
+    .background-image2 {
+        background-image: url('https://i.pinimg.com/564x/8b/90/9b/8b909bd08523179dee172ed4484989f0.jpg');
+        background-size: cover;
+        background-position: center;
+    }
+    .background-image3 {
+        background-image: url('https://i.pinimg.com/564x/36/3c/68/363c680403ce153c5afadf4ff4d9fd2e.jpg');
+        background-size: cover;
+        background-position: center;
+    }
+    .background-image4 {
+        background-image: url('https://i.pinimg.com/564x/6a/14/d5/6a14d536254ac8b58e0a80855d613a87.jpg');
+        background-size: cover;
+        background-position: center;
+    }
+
+    body {
+        overflow: hidden;
+    }
+
+</style>
+
+<script>
+    var section = 1
+    let isScrolling = false;
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+    }
+
+    function checkAccessToken() {
+        const accessToken = getCookie("access_token");
+        
+        if (accessToken) {
+            document.getElementById("authorized").classList.remove("hidden");
+        } else {
+            document.getElementById("unauthorized").classList.remove("hidden");
+        }
+    }
+
+    function smoothScroll(target, duration) {
+        const targetElement = document.getElementById(target);
+        const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY;
+        const startPosition = window.scrollY;
+        const distance = targetPosition - startPosition;
+        let startTime = null;
+
+        isScrolling = true; // Устанавливаем флаг, что скролл идет
+
+        function animation(currentTime) {
+            if (startTime === null) startTime = currentTime;
+            const timeElapsed = currentTime - startTime;
+            const run = ease(timeElapsed, startPosition, distance, duration);
+            window.scrollTo(0, run);
+            if (timeElapsed < duration) {
+                requestAnimationFrame(animation);
+            } else {
+                isScrolling = false; // Сбрасываем флаг после завершения анимации
+            }
+        }
+
+        function ease(t, b, c, d) {
+            t /= d / 2;
+            if (t < 1) return c / 2 * t * t + b;
+            t--;
+            return -c / 2 * (t * (t - 2) - 1) + b;
+        }
+
+        requestAnimationFrame(animation);
+    }
+
+    function scrollToSection(id) {
+        smoothScroll(`section${id}`, 800);
+    }
+
+    function handleScrollDown(event) {
+        if (isScrolling === false) {
+            console.log(section)
+            if (event.deltaY > 0) {
+                section++;
+                if (section == 5) {
+                    section = 1
+                }
+            } else {
+                if (section > 1){
+                    section--;
+                }
+            }
+            scrollToSection(section)
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        window.addEventListener("wheel", handleScrollDown);
+
+    
+        document.getElementById("open-modal-login").addEventListener("click", function() {
+            if (!document.getElementById("modal-overlay-signup").classList.contains('hidden')) {
+                document.getElementById("modal-overlay-signup").classList.add("hidden");
+            }
+            document.getElementById("modal-overlay-login").classList.remove("hidden");
+        });
+
+        document.getElementById("close-modal-login").addEventListener("click", function() {
+            document.getElementById("modal-overlay-login").classList.add("hidden");
+        });
+
+        document.getElementById("modal-overlay-login").addEventListener("click", function(event) {
+            if (event.target === this) {
+                this.classList.add("hidden");
+            }
+        });
+
+        document.getElementById("open-modal-signup").addEventListener("click", function() {
+            if (!document.getElementById("modal-overlay-login").classList.contains('hidden')) {
+                document.getElementById("modal-overlay-login").classList.add("hidden");
+            }
+            document.getElementById("modal-overlay-signup").classList.remove("hidden");
+        });
+
+        document.getElementById("close-modal-signup").addEventListener("click", function() {
+            document.getElementById("modal-overlay-signup").classList.add("hidden");
+        });
+
+        document.getElementById("modal-overlay-signup").addEventListener("click", function(event) {
+            if (event.target === this) {
+                this.classList.add("hidden");
+            }
+        });
+
+        document.getElementById("loginForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById("username-login").value;
+            const password = document.getElementById("password-login").value;
+
+            console.log(username)
+            console.log(password)
+
+        });
+
+        document.getElementById("signupForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById("username-signup").value;
+            const password = document.getElementById("password-signup").value;
+            const imageFile = document.getElementById("image-upload").files[0];
+
+            console.log(username)
+            console.log(password)
+            console.log(imageFile)
+
+        });
+
+
+        checkAccessToken();
+    });
+</script>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div id="unauthorized" class="hidden">
+    <div id="modal-overlay-login" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+        <!-- Modal Box -->
+        <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-1/3 p-6 relative">
+            <!-- Close Button -->
+            <button id="close-modal-login" class="absolute top-4 right-4 text-gray-600 hover:text-gray-900">
+                ✕
+            </button>
+
+            <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+                <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+                  <img class="mx-auto h-10 w-auto" src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600" alt="Your Company">
+                  <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Sign in to your account</h2>
+                </div>
+              
+                <div class="mt-2 sm:mx-auto sm:w-full sm:max-w-sm">
+                  <form class="space-y-6" id="loginForm">
+                    <div>
+                      <label for="username" class="block text-sm/6 font-medium text-gray-900">Username</label>
+                      <div class="mt-2">
+                        <input id="username-login" name="username" type="username" required class="px-4 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+                      </div>
+                    </div>
+              
+                    <div>
+                      <div class="flex items-center justify-between">
+                        <label for="password" class="block text-sm/6 font-medium text-gray-900">Password</label>
+                      </div>
+                      <div class="mt-2">
+                        <input id="password-login" name="password" type="password" autocomplete="current-password" required class="px-4 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+                      </div>
+                    </div>
+              
+                    <div>
+                      <button type="submit" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Sign in</button>
+                    </div>
+                  </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-overlay-signup" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+        <!-- Modal Box -->
+        <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-1/3 p-6 relative">
+            <!-- Close Button -->
+            <button id="close-modal-signup" class="absolute top-4 right-4 text-gray-600 hover:text-gray-900">
+                ✕
+            </button>
+
+            <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+                <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+                  <img class="mx-auto h-10 w-auto" src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600" alt="Your Company">
+                  <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Sign up to your account</h2>
+                </div>
+              
+                <div class="mt-2 sm:mx-auto sm:w-full sm:max-w-sm">
+
+                  <form class="space-y-6" id="signupForm">
+                        <div>
+                            <label for="username" class="block text-sm/6 font-medium text-gray-900">Username</label>
+                            <div class="mt-2">
+                                <input id="username-signup" name="username" type="text" required class="px-4 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex items-center justify-between">
+                                <label for="password" class="block text-sm/6 font-medium text-gray-900">Password</label>
+                            </div>
+                            <div class="mt-2">
+                                <input id="password-signup" name="password" type="password" autocomplete="current-password" required class="px-4 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="image" class="block text-sm/6 font-medium text-gray-900">Upload Image or GIF</label>
+                            <div class="mt-2">
+                                <input id="image-upload" name="image" type="file" accept="image/*" class="px-4 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+                            </div>
+                        </div>
+
+                        <div>
+                            <button type="submit" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Sign in</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bg-white fixed top-0 w-full shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="#" class="text-2xl font-bold text-indigo-600">BrandLogo</a>
+                </div>
+            
+                
+                <!-- Signup and Login Buttons -->
+                <div class="flex items-center space-x-4">
+                    <button id="open-modal-signup" class="px-4 py-2 rounded-md text-sm font-medium text-indigo-600 border border-indigo-600 hover:bg-indigo-600 hover:text-white transition">Signup</button>
+                    <button id="open-modal-login"  class="px-4 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 transition">Login</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+
+    <div id="section1" class="background-image1 h-screen w-full flex items-center justify-center bg-gray-900 bg-opacity-75">
+
+        <!-- Центрированный текст -->
+        <div class="text-center text-white p-6 bg-black bg-opacity-50 rounded-lg">
+            <h1 class="text-4xl font-bold mb-4">Pisya</h1>
+            <p class="text-lg mb-4">This is a full-page background image example with centered text.</p>
+        </div>
+    </div>
+    <div id="section2"  class="background-image2 h-screen w-full flex items-center justify-center bg-gray-900 bg-opacity-75">
+
+        <!-- Центрированный текст -->
+        <div class="text-center text-white p-6 bg-black bg-opacity-50 rounded-lg">
+            <h1 class="text-4xl font-bold mb-4">Popa</h1>
+            <p class="text-lg mb-4">This is a full-page background image example with centered text.</p>
+        </div>
+    </div>
+    <div id="section3"  class="background-image3 h-screen w-full flex items-center justify-center bg-gray-900 bg-opacity-75">
+
+        <!-- Центрированный текст -->
+        <div class="text-center text-white p-6 bg-black bg-opacity-50 rounded-lg">
+            <h1 class="text-4xl font-bold mb-4">Kakashechki</h1>
+            <p class="text-lg mb-4">This is a full-page background image example with centered text.</p>
+        </div>
+    </div>
+    <div id="section4"  class="background-image4 h-screen w-full flex items-center justify-center bg-gray-900 bg-opacity-75">
+
+        <!-- Центрированный текст -->
+        <div class="text-center text-white p-6 bg-black bg-opacity-50 rounded-lg">
+            <h1 class="text-4xl font-bold mb-4">Sisi</h1>
+            <p class="text-lg mb-4">This is a full-page background image example with centered text.</p>
+        </div>
+    </div>
+</div>
+
+
+<div id="authorized" class="hidden">
+    Pins
+</div>
+
+{% endblock %}

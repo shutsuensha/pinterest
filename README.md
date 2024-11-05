@@ -1,6 +1,5 @@
 ## TO DO
 
-
 ## Features
 - user registration
 - user verification via email

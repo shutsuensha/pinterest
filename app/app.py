@@ -1,8 +1,13 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from app.api.users.routes import users_router
 from app.api.pins.routes import pin_router
 from app.api.tags.routers import tag_router
 from app.api.comments.routers import comment_router
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+
+
+
 
 version = "v1"
 
@@ -42,7 +47,17 @@ app = FastAPI(
     redoc_url=f"{version_prefix}/redoc",
 )
 
+templates = Jinja2Templates(directory="app/templates")
+
+
 app.include_router(pin_router, prefix=f'{version_prefix}/pins', tags=['pins'])
 app.include_router(comment_router, prefix=f'{version_prefix}/comments', tags=['comments'])
 app.include_router(tag_router, prefix=f'{version_prefix}/tags', tags=['tags'])
 app.include_router(users_router, prefix=f'{version_prefix}/users', tags=['users'])
+
+
+@app.get("/")
+async def index(request: Request):
+    return templates.TemplateResponse(
+        request=request, name="index/index.html"
+    )
