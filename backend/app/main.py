@@ -1,7 +1,7 @@
 from fastapi import FastAPI
+from app.api.pins.routes import pin_router
+
 
 app = FastAPI()
 
-@app.get('/')
-async def root():
-    return 'hi'
+app.include_router(pin_router)
