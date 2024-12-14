@@ -115,6 +115,7 @@ async def upload_image(file: UploadFile, user_id: int, db: db):
 
     return {"status": "ok"}
 
+
 @router.get("/upload/{user_id}")
 async def get_image(user_id: int, db: db):
     user = await db.scalar(select(UsersOrm).where(UsersOrm.id == user_id))
