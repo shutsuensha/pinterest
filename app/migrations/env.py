@@ -10,7 +10,7 @@ from alembic import context
 from app.config import settings
 
 from app.database.db_base import Base
-from app.database.models import PinsOrm
+from app.database.models import UsersOrm
 
 config = context.config
 
